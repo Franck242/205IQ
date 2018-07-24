@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+
+from math import *
+import sys
+
+########### utils functions ###################################
+def print_usage():
+    print "USAGE"
+    print "\t   ./205IQ micro sigma [IQ1] [IQ2]\n"
+    print "DESCRIPTION"
+    print "\t   micro predetermined mean"
+    print "\t   sigma predetermined standard deviation"
+    print "\t   IQ1   minimum IQ"
+    print "\t   IQ2   maximum IQ"
+    exit(0)
+
+def check_id_values(value_iq):
+    if (value_iq < 0 or value_iq > 200):
+        sys.stderr.write('Error, IQ values must be between 0 and 200\n')
+        exit(84)
+        
+def density_of_iq_values(micro, sigma):
+    res = 0.0
+    index = 0
+
+    check_id_values(micro)
+    check_id_values(sigma)
+    while (index <= 200):
+        res = (1 / (float(sigma) * sqrt(2 * pi))) * exp(-0.5 * pow((float(micro) - float(index)) / float(sigma), 2))
+        res = res * 100
+        print "%i" % (index),
+        print "%.2f" % (res)
+        index = index + 1
+
+def percentage_iq_inferior(micro, sigma, value_iq):
+    idx = 0.0
+    res = 0.0
+    
+    check_id_values(value_iq)
+    while (idx < value_iq):
+        res = res + (1 / (float(sigma) * sqrt(2 * pi))) * exp(-0.5 * pow((float(idx) - float(micro)) / float(sigma), 2))
+        idx = idx + 0.01
+    print "%0.1f%% of people have an IQ inferior to %d" %(res, value_iq)
+
+def percentage_iq_in_intervalle(micro, sigma, value_iq1, value_iq2):
+    res = 0.0
+    idx = value_iq1 * 1.0
+
+    check_id_values(value_iq1)
+    check_id_values(value_iq2)
+    while (idx < value_iq2):
+        res = res + (1 / (float(sigma) * sqrt(2 * pi))) * exp(-0.5 * pow((float(idx) - float(micro)) / float(sigma), 2))
+        idx = idx + 0.01
+    print "%0.1f%% of people have an IQ between %d and %d" %(res, value_iq1, value_iq2)
+###############################################################
+
+############### Main executions ###############################
+nbr_av = len(sys.argv)
+
+if (nbr_av == 2 and sys.argv[1] == "-h"):
+    print_usage()
+if (nbr_av < 3 or nbr_av > 5):
+    sys.stderr.write('Error, too many or too few argument(s)\n')
+    exit(84)
+if (nbr_av == 3):
+    try:
+        micro = int(sys.argv[1])
+        sigma = int(sys.argv[2])
+        density_of_iq_values(micro, sigma)
+        exit(0)
+    except ValueError:
+        sys.stderr.write('Error, bad type of arguments. Arguments must be integers\n')
+        exit(84)
+if (nbr_av == 4):
+    try:
+        micro = int(sys.argv[1])
+        sigma = int(sys.argv[2])
+        value_iq = int(sys.argv[3])
+        percentage_iq_inferior(micro, sigma, value_iq)
+        exit(0)
+    except ValueError:
+   	sys.stderr.write('Error, bad type of arguments. Arguments must be integers\n')
+        exit(84)
+if (nbr_av == 5):
+    try:
+        micro = int(sys.argv[1])
+        sigma = int(sys.argv[2])
+        value_iq1 = int(sys.argv[3])
+        value_iq2 = int(sys.argv[4])
+        if (value_iq1 > value_iq2):
+            sys.stderr.write('Error, IQ2 must be great than IQ1\n')
+            exit(84)
+        percentage_iq_in_intervalle(micro, sigma, value_iq1, value_iq2)
+        exit(0)
+    except ValueError:
+   	sys.stderr.write('Error, bad type of arguments. Arguments must be integers\n')
+        exit(84)
